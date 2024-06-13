@@ -26,12 +26,12 @@ typedef struct Queue {
 void push(Stack* stack, char* newUrl);
 char* pop(Stack* stack);
 char* peek(Stack* stack);
-bool isEmpty(Stack* stack);
+bool isEmptyStack(Stack* stack);
 /*queue fucns*/
 void enqueue(Queue* queue, char* newUrl);
 char* dequeue(Queue* queue);
 char* peek(Queue* queue);
-bool isEmpty(Queue* queue);
+bool isEmptyQueue(Queue* queue);
 /*crate stuck/queue*/
 StackNode* createStackNode(char* url);
 QueueNode* createQueue(char* url);
@@ -129,27 +129,69 @@ void push(Stack* stack, char* newUrl) {
 
 char* pop(Stack* stack) {
 
+	if (isEmptyStack(stack)) {
+		printf("Stack underflow");
+		return;
+	}
 
+	StackNode* temp = stack->top;
+	stack->top = stack->top->next;
+	char* url = temp->url;
+	free(temp->url);
+	free(temp->next);
+	free(temp);
+	return url;
 
 }
 
 char* peek(Stack* stack) {
+	if (stack->top == NULL) {
+		return NULL;
+	}
+	else {
+		return stack->top->url;
+	}
 
 }
 
-bool isEmpty(Stack* stack) {
-
+bool isEmptyStack(Stack* stack) {
+	return stack->top == NULL;
 }
 
 void enqueue(Queue* queue, char* newUrl) {
 
+	QueueNode* newNode = createQueue(newUrl);
+	if (queue->rear == NULL) {
+		queue->front = queue->rear = newNode;
+		return;
+	}
+	queue->rear->next = newNode;
+	queue->rear = newNode;
+
 }
 char* dequeue(Queue* queue) {
 
+	if (queue->front == NULL) {
+		return NULL;
+	}
+	QueueNode* temp = queue->front;
+	queue->front = queue->front->next;
+	if (queue->front == NULL) {
+		queue->rear = NULL;
+	}
+	char* url = temp->url;
+	free(temp->next);
+	free(temp->url);
+	free(temp);
+	return url;
+
 }
 char* peek(Queue* queue) {
-
+	if (queue->front == NULL) {
+		return NULL;
+	}
+	return queue->front->url;
 }
-bool isEmpty(Queue* queue) {
-
+bool isEmptyQueue(Queue* queue) {
+	return queue->front == NULL;
 }
