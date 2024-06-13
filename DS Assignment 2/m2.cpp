@@ -94,7 +94,7 @@ int main(void) {
 
 StackNode* createStackNode(char* url) {
 
-	StackNode* newStack = (struct StackNode*)malloc(sizeof(struct StackNode));
+	StackNode* newStack = (StackNode*)malloc(sizeof(StackNode));
 	newStack->url = strdup(url);
 	newStack->next = NULL;
 	if (newStack->url == NULL) {
@@ -120,9 +120,16 @@ QueueNode* createQueue(char* url) {
 }
 void push(Stack* stack, char* newUrl) {
 
+	StackNode* newStack = createStackNode(newUrl);
+	newStack->next = stack->top;
+	stack->top = newStack;
+
+
 }
 
 char* pop(Stack* stack) {
+
+
 
 }
 
