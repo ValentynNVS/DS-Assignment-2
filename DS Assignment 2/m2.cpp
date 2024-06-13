@@ -45,6 +45,8 @@ dequeue, peek, isEpmty*/
 
 int main(void) {
 
+	Stack backStack = {NULL};
+	Queue forwardQueue = { NULL, NULL };
 	int userChoice = 0;
 	char urlLink[kMaxCharSize] = "";
 
@@ -67,25 +69,64 @@ int main(void) {
 			size_t len = strcspn(urlLink, "\n");
 			urlLink[len] = '\0';
 
-			printf("Visited: ");
+			push(&backStack, urlLink);
+			while (!isEmptyQueue(&forwardQueue)) {
+				free(dequeue(&forwardQueue));
+			}
+			printf("Visited: %s\n", urlLink));
 			continue;
 		}
 		else if (userChoice == 2) {
-			printf("Previous page: ");
-			continue;
+			if (isEmptyStack(&backStack) || backStack.top->next == NULL) {
+				printf("No previous page.\n");
+			}
+			else {
+				char* currentUrl = pop(&backStack);
+				enqueue(&forwardQueue, currentUrl);
+				printf("Previous page: %s\n", peek(&backStack));
+			}
 		}
 		else if (userChoice == 3) {
-
+			if (isEmptyQueue(&forwardQueue)) {
+				printf("No next page.\n");
+			}
+			else {
+				char* nextUrl = dequeue(&forwardQueue);
+				push(&backStack, nextUrl);
+				printf("Next page: %s\n", nextUrl);
+			}
 		}
 		else if (userChoice == 4) {
-
+			printf("Current Page: %s\n", backStack.top ? backStack.top->url : "None");
+			printf("Backward History:\n");
+			StackNode* tempStack = backStack.top;
+			int count = 1;
+			while (tempStack) {
+				printf("%d. %s\n", count++, tempStack->url);
+				tempStack = tempStack->next;
+			}
+			printf("Forward History:\n");
+			QueueNode* tempQueue = forwardQueue.front;
+			count = 1;
+			while (tempQueue) {
+				printf("%d. %s\n", count++, tempQueue->url);
+				tempQueue = tempQueue->next;
+			}
 		}
 		else if (userChoice == 5) {
-			printf("Thank you for using the web browser. Goodbye!");
-			/*free up all allocated memory*/
+			printf("Thank you for using the web browser. Goodbye!\n");
+			// Free allocated memory
+			while (!isEmptyStack(&backStack)) {
+				free(pop(&backStack));
+			}
+			while (!isEmptyQueue(&forwardQueue)) {
+				free(dequeue(&forwardQueue));
+			}
 			break;
 		}
-
+		else {
+			printf("Invalid entry, try again.");
+		}
 	}
 
 	return 0;
