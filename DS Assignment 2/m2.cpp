@@ -35,6 +35,8 @@ bool isEmptyQueue(Queue* queue);
 /*crate stuck/queue*/
 StackNode* createStackNode(char* url);
 QueueNode* createQueue(char* url);
+Stack* InitializeStack(void);
+Queue* InitializeQueue(void);
 
 /* create stack and implement push
 pop, peek, isEmpty fucns for it*/
@@ -45,14 +47,14 @@ dequeue, peek, isEpmty*/
 
 int main(void) {
 
-	Stack backStack = {NULL};
-	Queue forwardQueue = { NULL, NULL };
+	Stack* backStack = InitializeStack();
+	Queue* forwardQueue = InitializeQueue();
 	int userChoice = 0;
 	char urlLink[kMaxCharSize] = "";
 
 	while (1) {
 		printf("Menu:\n1. Visit New Web Page\n2. Navigate Backward\n\
-3. Navigate Forward\n4. Display Current Page and History\n5. Exit");
+3. Navigate Forward\n4. Display Current Page and History\n5. Exit\n");
 		printf("Enter your choice: ");
 
 		if (scanf("%d", &userChoice) == 1) {
@@ -69,63 +71,87 @@ int main(void) {
 			size_t len = strcspn(urlLink, "\n");
 			urlLink[len] = '\0';
 
-			push(&backStack, urlLink);
-			while (!isEmptyQueue(&forwardQueue)) {
-				free(dequeue(&forwardQueue));
+			push(backStack, urlLink);
+			while (!isEmptyQueue(forwardQueue)) {
+				free(dequeue(forwardQueue));
 			}
 			printf("Visited: %s\n", urlLink);
 			continue;
 		}
 		else if (userChoice == 2) {
-			if (isEmptyStack(&backStack) || backStack.top->next == NULL) {
+			if (isEmptyStack(backStack) || backStack->top->next == NULL) {
 				printf("No previous page.\n");
 			}
 			else {
-				char* currentUrl = pop(&backStack);
-				enqueue(&forwardQueue, currentUrl);
-				printf("Previous page: %s\n", peek(&backStack));
+				char* currentUrl = pop(backStack);
+				enqueue(forwardQueue, currentUrl);
+				printf("Previous page: %s\n", peek(backStack));
 			}
 		}
 		else if (userChoice == 3) {
-			if (isEmptyQueue(&forwardQueue)) {
+			if (isEmptyQueue(forwardQueue)) {
 				printf("No next page.\n");
 			}
 			else {
-				char* nextUrl = dequeue(&forwardQueue);
-				push(&backStack, nextUrl);
+				char* nextUrl = dequeue(forwardQueue);
+				push(backStack, nextUrl);
 				printf("Next page: %s\n", nextUrl);
 			}
 		}
 		else if (userChoice == 4) {
-			printf("Current Page: %s\n", backStack.top ? backStack.top->url : "None");
+			printf("Current Page: %s\n", backStack->top ? backStack->top->url : "None");
 			printf("Backward History:\n");
-			StackNode* tempStack = backStack.top;
+			StackNode* tempStack = backStack->top;
+			tempStack = tempStack->next;
 			int count = 1;
 			while (tempStack) {
 				printf("%d. %s\n", count++, tempStack->url);
 				tempStack = tempStack->next;
 			}
 			printf("Forward History:\n");
-			QueueNode* tempQueue = forwardQueue.front;
+			QueueNode* tempQueue = forwardQueue->front;
 			count = 1;
+
+			// Use an array to temporarily store the URLs from the forward queue
+			int queueSize = 0;
+			tempQueue = forwardQueue->front;
 			while (tempQueue) {
-				printf("%d. %s\n", count++, tempQueue->url);
+				queueSize++;
 				tempQueue = tempQueue->next;
 			}
+
+			// Allocate an array to hold the URLs
+			char** urlArray = (char**)malloc(queueSize * sizeof(char*));
+
+			// Fill the array with URLs
+			tempQueue = forwardQueue->front;
+			for (int i = 0; i < queueSize; i++) {
+				urlArray[i] = tempQueue->url;
+				tempQueue = tempQueue->next;
+			}
+
+			// Print the URLs in reverse order
+			for (int i = queueSize - 1; i >= 0; i--) {
+				printf("%d. %s\n", count++, urlArray[i]);
+			}
+
+			// Free the allocated memory
+			free(urlArray);
 		}
 		else if (userChoice == 5) {
 			printf("Thank you for using the web browser. Goodbye!\n");
 			// Free allocated memory
-			while (!isEmptyStack(&backStack)) {
-				free(pop(&backStack));
+			while (!isEmptyStack(backStack)) {
+				free(pop(backStack));
 			}
-			while (!isEmptyQueue(&forwardQueue)) {
-				free(dequeue(&forwardQueue));
+			while (!isEmptyQueue(forwardQueue)) {
+				free(dequeue(forwardQueue));
 			}
 			break;
 		}
 		else {
 			printf("Invalid entry, try again.");
+			break;
 		}
 	}
 
@@ -133,6 +159,23 @@ int main(void) {
 
 }
 
+
+Stack* InitializeStack(void) {
+	Stack* stack = (Stack*)malloc(sizeof(Stack));
+	stack->top = NULL;
+	return stack;
+}
+
+Queue* InitializeQueue(void) {
+	Queue* queue = (Queue*)malloc(sizeof(Queue));
+	if (queue == NULL) {
+		printf("No Memory");
+		exit(EXIT_FAILURE);
+	}
+	queue->front = NULL;
+	queue->rear = NULL;
+	return queue;
+}
 /*
 Function: createStackNode
 Parameters: char* url - pointer to the URL string for the new stack node
@@ -205,8 +248,6 @@ char* pop(Stack* stack) {
 	StackNode* temp = stack->top;
 	stack->top = stack->top->next;
 	char* url = temp->url;
-	free(temp->url);
-	free(temp->next);
 	free(temp);
 	return url;
 
@@ -235,7 +276,13 @@ Description: This function checks if the stack is empty.
 Return value: bool - true if the stack is empty, false otherwise
 */
 bool isEmptyStack(Stack* stack) {
-	return stack->top == NULL;
+	if (stack->top == NULL) {
+		return true;
+	}
+	else {
+		return false;
+	}
+	
 }
 
 /*
