@@ -90,53 +90,40 @@ int main(void) {
 		}
 		else if (userChoice == 3) {
 			if (isEmptyQueue(forwardQueue)) {
-				printf("No next page.\n");
+				printf("No next page to navigate to.\n");
 			}
 			else {
-				char* nextUrl = dequeue(forwardQueue);
-				push(backStack, nextUrl);
-				printf("Next page: %s\n", nextUrl);
+				char* nextPage = dequeue(forwardQueue);
+				push(backStack, nextPage);
+				printf("Navigated Forward to: %s\n", nextPage);
 			}
+			continue;
 		}
 		else if (userChoice == 4) {
-			printf("Current Page: %s\n", backStack->top ? backStack->top->url : "None");
-			printf("Backward History:\n");
-			StackNode* tempStack = backStack->top;
-			tempStack = tempStack->next;
-			int count = 1;
-			while (tempStack) {
-				printf("%d. %s\n", count++, tempStack->url);
-				tempStack = tempStack->next;
+			if(isEmptyStack(backStack)) {
+				printf("No current page to display\n");
+
 			}
+			else {
+
+			}
+			char* currUrl = peek(backStack);
+			printf("Current Page: %s\n", currUrl);
+
+			printf("Backward History:\n");
+			StackNode* temp = backStack->top;
+			temp = temp->next;
+			while (temp != NULL) {
+				printf("%s\n", temp->url);
+				temp = temp->next;
+			}
+
 			printf("Forward History:\n");
 			QueueNode* tempQueue = forwardQueue->front;
-			count = 1;
-
-			// Use an array to temporarily store the URLs from the forward queue
-			int queueSize = 0;
-			tempQueue = forwardQueue->front;
-			while (tempQueue) {
-				queueSize++;
+			while (tempQueue != NULL) {
+				printf("%s\n", tempQueue->url);
 				tempQueue = tempQueue->next;
 			}
-
-			// Allocate an array to hold the URLs
-			char** urlArray = (char**)malloc(queueSize * sizeof(char*));
-
-			// Fill the array with URLs
-			tempQueue = forwardQueue->front;
-			for (int i = 0; i < queueSize; i++) {
-				urlArray[i] = tempQueue->url;
-				tempQueue = tempQueue->next;
-			}
-
-			// Print the URLs in reverse order
-			for (int i = queueSize - 1; i >= 0; i--) {
-				printf("%d. %s\n", count++, urlArray[i]);
-			}
-
-			// Free the allocated memory
-			free(urlArray);
 		}
 		else if (userChoice == 5) {
 			printf("Thank you for using the web browser. Goodbye!\n");
@@ -321,8 +308,6 @@ char* dequeue(Queue* queue) {
 		queue->rear = NULL;
 	}
 	char* url = temp->url;
-	free(temp->next);
-	free(temp->url);
 	free(temp);
 	return url;
 
