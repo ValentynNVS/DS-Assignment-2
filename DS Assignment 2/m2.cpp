@@ -73,7 +73,7 @@ int main(void) {
 			while (!isEmptyQueue(&forwardQueue)) {
 				free(dequeue(&forwardQueue));
 			}
-			printf("Visited: %s\n", urlLink));
+			printf("Visited: %s\n", urlLink);
 			continue;
 		}
 		else if (userChoice == 2) {
@@ -133,6 +133,12 @@ int main(void) {
 
 }
 
+/*
+Function: createStackNode
+Parameters: char* url - pointer to the URL string for the new stack node
+Description: This function creates a new stack node with the given URL.
+Return value: StackNode* - pointer to the newly created stack node
+*/
 StackNode* createStackNode(char* url) {
 
 	StackNode* newStack = (StackNode*)malloc(sizeof(StackNode));
@@ -146,6 +152,13 @@ StackNode* createStackNode(char* url) {
 
 	return newStack;
 }
+
+/*
+Function: createQueue
+Parameters: char* url - pointer to the URL string for the new queue node
+Description: This function creates a new queue node with the given URL.
+Return value: QueueNode* - pointer to the newly created queue node
+*/
 QueueNode* createQueue(char* url) {
 
 	QueueNode* newQueue = (QueueNode*)malloc(sizeof(QueueNode));
@@ -159,6 +172,14 @@ QueueNode* createQueue(char* url) {
 
 	return newQueue;
 }
+
+/*
+Function: push
+Parameters: Stack* stack - pointer to the stack
+			char* newUrl - pointer to the new URL string to be added
+Description: This function adds a new URL to the top of the stack.
+Return value: void
+*/
 void push(Stack* stack, char* newUrl) {
 
 	StackNode* newStack = createStackNode(newUrl);
@@ -168,11 +189,17 @@ void push(Stack* stack, char* newUrl) {
 
 }
 
+/*
+Function: pop
+Parameters: Stack* stack - pointer to the stack
+Description: This function removes and returns the URL from the top of the stack.
+Return value: char* - the URL from the top of the stack
+*/
 char* pop(Stack* stack) {
 
 	if (isEmptyStack(stack)) {
 		printf("Stack underflow");
-		return;
+		return NULL;
 	}
 
 	StackNode* temp = stack->top;
@@ -185,6 +212,12 @@ char* pop(Stack* stack) {
 
 }
 
+/*
+Function: peek
+Parameters: Stack* stack - pointer to the stack
+Description: This function returns the URL from the top of the stack without removing it.
+Return value: char* - the URL from the top of the stack
+*/
 char* peek(Stack* stack) {
 	if (stack->top == NULL) {
 		return NULL;
@@ -195,10 +228,23 @@ char* peek(Stack* stack) {
 
 }
 
+/*
+Function: isEmptyStack
+Parameters: Stack* stack - pointer to the stack
+Description: This function checks if the stack is empty.
+Return value: bool - true if the stack is empty, false otherwise
+*/
 bool isEmptyStack(Stack* stack) {
 	return stack->top == NULL;
 }
 
+/*
+Function: enqueue
+Parameters: Queue* queue - pointer to the queue
+			char* newUrl - pointer to the new URL string to be added
+Description: This function adds a new URL to the rear of the queue.
+Return value: void
+*/
 void enqueue(Queue* queue, char* newUrl) {
 
 	QueueNode* newNode = createQueue(newUrl);
@@ -210,6 +256,13 @@ void enqueue(Queue* queue, char* newUrl) {
 	queue->rear = newNode;
 
 }
+
+/*
+Function: dequeue
+Parameters: Queue* queue - pointer to the queue
+Description: This function removes and returns the URL from the front of the queue.
+Return value: char* - the URL from the front of the queue
+*/
 char* dequeue(Queue* queue) {
 
 	if (queue->front == NULL) {
@@ -227,12 +280,26 @@ char* dequeue(Queue* queue) {
 	return url;
 
 }
+
+/*
+Function: peek
+Parameters: Queue* queue - pointer to the queue
+Description: This function returns the URL from the front of the queue without removing it.
+Return value: char* - the URL from the front of the queue
+*/
 char* peek(Queue* queue) {
 	if (queue->front == NULL) {
 		return NULL;
 	}
 	return queue->front->url;
 }
+
+/*
+Function: isEmptyQueue
+Parameters: Queue* queue - pointer to the queue
+Description: This function checks if the queue is empty.
+Return value: bool - true if the queue is empty, false otherwise
+*/
 bool isEmptyQueue(Queue* queue) {
 	return queue->front == NULL;
 }
